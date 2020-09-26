@@ -30,6 +30,7 @@ const SectionListContacts = (props) => {
     <SectionList
       style={{ paddingLeft: 10 }}
       sections={sections}
+      keyExtractor={(item, index) => item + index}
       renderItem={renderItem}
       renderSectionHeader={renderSectionHeader}
     />

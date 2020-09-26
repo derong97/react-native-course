@@ -1,12 +1,48 @@
 import React from "react";
-import { Button, View, StyleSheet, Text } from "react-native";
+import { Button, View, StyleSheet, Text, TextInput } from "react-native";
+import { login } from "../api";
 
 export default class LoginScreen extends React.Component {
+  state = {
+    username: "",
+    password: "",
+  };
+
+  _login = async () => {
+    try {
+      const success = await login(this.state.username, this.state.password);
+      this.props.loginStatus(success);
+    } catch (err) {
+      const errMessage = err.message;
+      this.setState({ err: errMessage });
+    }
+  };
+
+  handleUsernameUpdate = (username) => {
+    this.setState({ username });
+  };
+
+  handlePasswordUpdate = (password) => {
+    this.setState({ password });
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>You are currently logged out.</Text>
-        <Button title="Press to Log In" onPress={this.props.onLogIn} />
+        <Text style={styles.error}>{this.state.err}</Text>
+        <TextInput
+          placeholder="username"
+          value={this.state.username}
+          onChangeText={this.handleUsernameUpdate}
+          autoCapitalize="none"
+        />
+        <TextInput
+          placeholder="password"
+          value={this.state.password}
+          onChangeText={this.handlePasswordUpdate}
+          secureTextEntry
+        />
+        <Button title="Press to Log In" onPress={this._login} />
       </View>
     );
   }
@@ -19,5 +55,9 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: "center",
+  },
+  error: {
+    textAlign: "center",
+    color: "red",
   },
 });

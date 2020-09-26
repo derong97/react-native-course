@@ -1,12 +1,11 @@
+import Constants from "expo-constants";
 import React from "react";
 import {
   Button,
   KeyboardAvoidingView,
   StyleSheet,
   TextInput,
-  View,
 } from "react-native";
-import Constants from "expo-constants";
 
 const styles = StyleSheet.create({
   container: {

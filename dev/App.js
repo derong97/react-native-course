@@ -8,16 +8,36 @@ import ContactDetailsScreen from "./screens/ContactDetailsScreen";
 import ContactListScreen from "./screens/ContactListScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import LoadingScreen from "./screens/LoadingScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { fetchUsers } from "./api";
 
 const Stack = createStackNavigator();
 
 class ContactsTab extends React.Component {
   state = {
-    contacts: contacts,
+    dataIsReturned: false,
+    contacts: null,
+  };
+
+  componentDidMount() {
+    this.getUsers();
+  }
+
+  getUsers = async () => {
+    const results = await fetchUsers();
+    this.setState({ contacts: results });
+    this.setState({ dataIsReturned: true });
   };
 
   render() {
+    if (!this.state.dataIsReturned)
+      return (
+        <Stack.Navigator>
+          <Stack.Screen name="Loading" component={LoadingScreen} />
+        </Stack.Navigator>
+      );
+
     return (
       <Stack.Navigator
         initialRouteName="ContactList"
@@ -26,7 +46,7 @@ class ContactsTab extends React.Component {
         <Stack.Screen
           name="ContactList"
           component={ContactListScreen}
-          initialParams={{ contacts }}
+          initialParams={{ contacts: this.state.contacts }}
           options={{
             title: "Contacts",
           }}
@@ -35,7 +55,7 @@ class ContactsTab extends React.Component {
         <Stack.Screen
           name="AddContact"
           component={AddContactScreen}
-          initialParams={{ contacts }}
+          initialParams={{ contacts: this.state.contacts }}
           options={{
             title: "Add Contact",
           }}
@@ -44,7 +64,7 @@ class ContactsTab extends React.Component {
         <Stack.Screen
           name="ContactDetails"
           component={ContactDetailsScreen}
-          initialParams={{ contacts }}
+          initialParams={{ contacts: this.state.contacts }}
           options={({ route }) => ({
             title: route.params.name,
           })}
@@ -87,8 +107,8 @@ export default class App extends React.Component {
     isLoggedIn: false,
   };
 
-  onLogIn = () => {
-    this.setState({ isLoggedIn: true });
+  loginStatus = (success) => {
+    this.setState({ isLoggedIn: success });
   };
 
   render() {
@@ -97,7 +117,7 @@ export default class App extends React.Component {
         {this.state.isLoggedIn ? (
           <MainNavigator />
         ) : (
-          <LoginScreen onLogIn={this.onLogIn} />
+          <LoginScreen loginStatus={this.loginStatus} />
         )}
       </NavigationContainer>
     );
